@@ -105,44 +105,62 @@
                 const data = await res.json();
                 
                 const posContainer = document.getElementById('topPositive');
-                posContainer.innerHTML = data.top_positive.map((v, i) => `
-                    <div class="group relative flex justify-between items-center bg-slate-900/50 p-2 rounded-lg border border-slate-700/50 transition hover:bg-slate-800 cursor-help">
+                posContainer.innerHTML = data.top_positive.map((v, i) => {
+                    const isPerfect = v.avg >= 5.0;
+                    const borderClass = isPerfect ? 'border-amber-400/80 ring-2 ring-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.6)] animate-pulse' : 'border-slate-700/50';
+                    const ratingColor = isPerfect ? 'text-amber-400 font-extrabold flex items-center gap-1 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]' : 'text-emerald-400 font-bold';
+                    const ratingText = isPerfect ? '👑 5.0★' : `${v.avg.toFixed(1)}★`;
+                    return `
+                    <div class="group relative flex justify-between items-center bg-slate-900/50 p-2 rounded-lg border transition hover:bg-slate-800 cursor-help ${borderClass}">
                         <span class="text-slate-300 truncate w-3/4 font-medium"><span class="text-slate-500 mr-1">#${i+1}</span> ${v.name} <span class="text-[10px] text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded ml-1">ID:${v.qr}</span></span>
-                        <span class="text-emerald-400 font-bold">${v.avg.toFixed(1)}★</span>
+                        <span class="${ratingColor}">${ratingText}</span>
                         
                         <!-- Tooltip flotante (Glassmorphism) -->
-                        <div class="pointer-events-none absolute bottom-[115%] left-1/2 -translate-x-1/2 mb-2 w-64 bg-slate-950/95 border border-brand-500/30 text-xs text-slate-200 p-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 backdrop-blur-md">
-                            <div class="font-bold text-brand-300 mb-1 flex justify-between">
-                                <span>${v.name}</span>
+                        <div class="pointer-events-none absolute bottom-[115%] left-1/2 -translate-x-1/2 mb-2 w-64 bg-slate-950/95 border ${isPerfect ? 'border-amber-400/50 shadow-[0_0_20px_rgba(251,191,36,0.4)]' : 'border-brand-500/30'} text-xs text-slate-200 p-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 backdrop-blur-md">
+                            <div class="font-bold ${isPerfect ? 'text-amber-400' : 'text-brand-300'} mb-1 flex justify-between">
+                                <span>${v.name} ${isPerfect ? '👑' : ''}</span>
                                 <span class="text-emerald-400">${v.avg.toFixed(1)}★</span>
                             </div>
                             <p class="font-light text-slate-400 leading-normal">${v.description}</p>
-                            <div class="text-[9px] text-slate-500 mt-1.5 italic">Total: ${v.count} reseñas</div>
+                            <div class="text-[9px] text-slate-500 mt-1.5 italic flex justify-between">
+                                <span>ID del puesto: #${v.qr}</span>
+                                <span>Total: ${v.count} reseñas</span>
+                            </div>
                             <!-- Flecha del tooltip -->
                             <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-950"></div>
                         </div>
                     </div>
-                `).join('') || '<p class="text-slate-500 text-xs italic">Sin datos suficientes</p>';
+                    `;
+                }).join('') || '<p class="text-slate-500 text-xs italic">Sin datos suficientes</p>';
 
                 const negContainer = document.getElementById('topNegative');
-                negContainer.innerHTML = data.top_negative.map((v, i) => `
-                    <div class="group relative flex justify-between items-center bg-slate-900/50 p-2 rounded-lg border border-slate-700/50 transition hover:bg-slate-800 cursor-help">
+                negContainer.innerHTML = data.top_negative.map((v, i) => {
+                    const isPerfect = v.avg >= 5.0;
+                    const borderClass = isPerfect ? 'border-amber-400/80 ring-2 ring-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.6)] animate-pulse' : 'border-slate-700/50';
+                    const ratingColor = isPerfect ? 'text-amber-400 font-extrabold flex items-center gap-1 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]' : 'text-amber-400 font-bold';
+                    const ratingText = isPerfect ? '👑 5.0★' : `${v.avg.toFixed(1)}★`;
+                    return `
+                    <div class="group relative flex justify-between items-center bg-slate-900/50 p-2 rounded-lg border transition hover:bg-slate-800 cursor-help ${borderClass}">
                         <span class="text-slate-300 truncate w-3/4 font-medium"><span class="text-slate-500 mr-1">#${i+1}</span> ${v.name} <span class="text-[10px] text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded ml-1">ID:${v.qr}</span></span>
-                        <span class="text-amber-400 font-bold">${v.avg.toFixed(1)}★</span>
+                        <span class="${ratingColor}">${ratingText}</span>
                         
                         <!-- Tooltip flotante (Glassmorphism) -->
-                        <div class="pointer-events-none absolute bottom-[115%] left-1/2 -translate-x-1/2 mb-2 w-64 bg-slate-950/95 border border-amber-500/30 text-xs text-slate-200 p-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 backdrop-blur-md">
-                            <div class="font-bold text-amber-300 mb-1 flex justify-between">
-                                <span>${v.name}</span>
+                        <div class="pointer-events-none absolute bottom-[115%] left-1/2 -translate-x-1/2 mb-2 w-64 bg-slate-950/95 border ${isPerfect ? 'border-amber-400/50 shadow-[0_0_20px_rgba(251,191,36,0.4)]' : 'border-brand-500/30'} text-xs text-slate-200 p-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 backdrop-blur-md">
+                            <div class="font-bold ${isPerfect ? 'text-amber-400' : 'text-amber-300'} mb-1 flex justify-between">
+                                <span>${v.name} ${isPerfect ? '👑' : ''}</span>
                                 <span class="text-amber-400">${v.avg.toFixed(1)}★</span>
                             </div>
                             <p class="font-light text-slate-400 leading-normal">${v.description}</p>
-                            <div class="text-[9px] text-slate-500 mt-1.5 italic">Total: ${v.count} reseñas</div>
+                            <div class="text-[9px] text-slate-500 mt-1.5 italic flex justify-between">
+                                <span>ID del puesto: #${v.qr}</span>
+                                <span>Total: ${v.count} reseñas</span>
+                            </div>
                             <!-- Flecha del tooltip -->
                             <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-950"></div>
                         </div>
                     </div>
-                `).join('') || '<p class="text-slate-500 text-xs italic">Sin datos suficientes</p>';
+                    `;
+                }).join('') || '<p class="text-slate-500 text-xs italic">Sin datos suficientes</p>';
             } catch (e) { console.error("Error leaderboard:", e); }
         }
 
