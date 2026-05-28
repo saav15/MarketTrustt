@@ -1,0 +1,26 @@
+/* Estilos CSS adicionales para el Frontend de MarketTrust */
+
+.glass-panel {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media print {
+    body {
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+    }
+    
+    #certificate {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 auto !important;
+        width: 100% !important;
+        height: 100% !important;
+        page-break-after: avoid;
+    }
+}
