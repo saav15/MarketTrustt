@@ -4,7 +4,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://TU-BACKEND-PRODUCCION.onrender.com/api/:path*"
+      "destination": "markettrustt.railway.internal"
     }
   ]
 }
