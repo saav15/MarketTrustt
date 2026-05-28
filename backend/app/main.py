@@ -119,6 +119,38 @@ def seed_database(db: Session):
                 ))
         db.commit()
 
+        # Crear el vendedor especial "777" (Elite, 5.0 estrellas, 40 reseñas)
+        vendedor_elite = models.Vendor(
+            qr_code="777",
+            name="Quesería Elite Imperial",
+            description="Puesto de Gala - El estándar de oro del mercado. Especialidad en productos de alta gama y atención de realeza."
+        )
+        db.add(vendedor_elite)
+        db.commit()
+        db.refresh(vendedor_elite)
+
+        comentarios_elite = [
+            "Es una experiencia mística, los quesos son de otro mundo y la atención es real.",
+            "Calidad digna de reyes. Limpieza absoluta y un trato inmejorable.",
+            "El mejor puesto de todo el mercado por mucho, un orgullo de la comunidad.",
+            "Los productos más selectos e higiénicos. Simplemente espectacular.",
+            "Atención impecable y productos de gala. Vale cada centavo.",
+            "Honestidad total, báscula exacta y un sabor legendario."
+        ]
+        
+        for i in range(40):
+            cliente = f"{random.choice(nombres_clientes)}_{i+1}"
+            c = random.choice(comentarios_elite)
+            db.add(models.Review(
+                vendor_id=vendedor_elite.id,
+                customer_name=cliente,
+                rating=5,
+                comment=c,
+                sentiment="Positivo",
+                attributes="Alta Calidad, Excelente trato, Limpio, Elite"
+            ))
+        db.commit()
+
 # Ejecutar seed localmente
 db = database.SessionLocal()
 seed_database(db)
@@ -181,7 +213,13 @@ def get_vendor_stats(vendor_qr: str, db: Session = Depends(database.get_db)):
         "vendor_name": vendor.name,
         "total_reviews": total_reviews,
         "average_rating": round(avg_rating, 2),
-        "top_attributes": top_attributes
+        "top_attributes": top_attributes,
+        "reviews": [{
+            "customer_name": r.customer_name,
+            "rating": r.rating,
+            "comment": r.comment,
+            "sentiment": r.sentiment or "Neutral"
+        } for r in reviews]
     }
 
 @app.get("/feed")
