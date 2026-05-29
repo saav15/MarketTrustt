@@ -89,15 +89,78 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs uppercase text-slate-400 font-bold tracking-wider mb-2">Foto de tu Local (Presets Rápidos o URL)</label>
-                        <!-- Selector de fotos Unsplash rápidas -->
-                        <div class="grid grid-cols-4 gap-2 mb-3">
-                            <button onclick="setPhotoPreset('frutas')" class="text-xs bg-slate-800 hover:bg-slate-700 p-2 rounded-lg border border-slate-700 transition" title="Puesto de Frutas">🍎 Frutas</button>
-                            <button onclick="setPhotoPreset('carniceria')" class="text-xs bg-slate-800 hover:bg-slate-700 p-2 rounded-lg border border-slate-700 transition" title="Carnicería">🥩 Carne</button>
-                            <button onclick="setPhotoPreset('panaderia')" class="text-xs bg-slate-800 hover:bg-slate-700 p-2 rounded-lg border border-slate-700 transition" title="Panadería">🍞 Pan</button>
-                            <button onclick="setPhotoPreset('queseria')" class="text-xs bg-slate-800 hover:bg-slate-700 p-2 rounded-lg border border-slate-700 transition" title="Quesería">🧀 Quesos</button>
+                        <label class="block text-xs uppercase text-slate-400 font-bold tracking-wider mb-2">📍 Ubicación Física (Tampico, Tamaulipas)</label>
+                        <input type="text" id="ownerVendorAddress" placeholder="Ej: Pasillo Principal #23, Mercado Municipal" class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm">
+                        <span class="text-[10px] text-slate-400 italic mt-1 block">El sistema generará el mapa de Google Maps automáticamente para tu certificado.</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase text-slate-400 font-bold tracking-wider mb-2">📸 Foto de Portada (Haz clic en un preset para seleccionar)</label>
+                        
+                        <!-- Galería de Miniaturas Deslizable Horizontal -->
+                        <div class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar mb-3 select-none">
+                            <div onclick="setPhotoPreset('frutas')" class="preset-card shrink-0 w-24 h-16 rounded-xl overflow-hidden relative cursor-pointer border-2 border-slate-700/80 hover:border-brand-500 transition duration-200" id="preset_frutas">
+                                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=150" class="w-full h-full object-cover" />
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-center p-1">
+                                    <span class="text-[9px] font-black text-white leading-tight">🍎 Frutas</span>
+                                </div>
+                            </div>
+                            <div onclick="setPhotoPreset('carniceria')" class="preset-card shrink-0 w-24 h-16 rounded-xl overflow-hidden relative cursor-pointer border-2 border-slate-700/80 hover:border-brand-500 transition duration-200" id="preset_carniceria">
+                                <img src="https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=150" class="w-full h-full object-cover" />
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-center p-1">
+                                    <span class="text-[9px] font-black text-white leading-tight">🥩 Carnes</span>
+                                </div>
+                            </div>
+                            <div onclick="setPhotoPreset('panaderia')" class="preset-card shrink-0 w-24 h-16 rounded-xl overflow-hidden relative cursor-pointer border-2 border-slate-700/80 hover:border-brand-500 transition duration-200" id="preset_panaderia">
+                                <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=150" class="w-full h-full object-cover" />
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-center p-1">
+                                    <span class="text-[9px] font-black text-white leading-tight">🍞 Panadería</span>
+                                </div>
+                            </div>
+                            <div onclick="setPhotoPreset('queseria')" class="preset-card shrink-0 w-24 h-16 rounded-xl overflow-hidden relative cursor-pointer border-2 border-slate-700/80 hover:border-brand-500 transition duration-200" id="preset_queseria">
+                                <img src="https://images.unsplash.com/photo-1486299267070-83823f5448dd?w=150" class="w-full h-full object-cover" />
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-center p-1">
+                                    <span class="text-[9px] font-black text-white leading-tight">🧀 Quesos</span>
+                                </div>
+                            </div>
+                            <div onclick="setPhotoPreset('flores')" class="preset-card shrink-0 w-24 h-16 rounded-xl overflow-hidden relative cursor-pointer border-2 border-slate-700/80 hover:border-brand-500 transition duration-200" id="preset_flores">
+                                <img src="https://images.unsplash.com/photo-1526047932273-341f2a7631f9?w=150" class="w-full h-full object-cover" />
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-center p-1">
+                                    <span class="text-[9px] font-black text-white leading-tight">🌸 Flores</span>
+                                </div>
+                            </div>
+                            <div onclick="setPhotoPreset('mariscos')" class="preset-card shrink-0 w-24 h-16 rounded-xl overflow-hidden relative cursor-pointer border-2 border-slate-700/80 hover:border-brand-500 transition duration-200" id="preset_mariscos">
+                                <img src="https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?w=150" class="w-full h-full object-cover" />
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-center p-1">
+                                    <span class="text-[9px] font-black text-white leading-tight">🐟 Mariscos</span>
+                                </div>
+                            </div>
+                            <div onclick="setPhotoPreset('dulces')" class="preset-card shrink-0 w-24 h-16 rounded-xl overflow-hidden relative cursor-pointer border-2 border-slate-700/80 hover:border-brand-500 transition duration-200" id="preset_dulces">
+                                <img src="https://images.unsplash.com/photo-1581798459219-318e76aecc7b?w=150" class="w-full h-full object-cover" />
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-center p-1">
+                                    <span class="text-[9px] font-black text-white leading-tight">🍬 Dulces</span>
+                                </div>
+                            </div>
+                            <div onclick="setPhotoPreset('jugos')" class="preset-card shrink-0 w-24 h-16 rounded-xl overflow-hidden relative cursor-pointer border-2 border-slate-700/80 hover:border-brand-500 transition duration-200" id="preset_jugos">
+                                <img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=150" class="w-full h-full object-cover" />
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-center p-1">
+                                    <span class="text-[9px] font-black text-white leading-tight">🥤 Jugos</span>
+                                </div>
+                            </div>
+                            <div onclick="setPhotoPreset('abarrotes')" class="preset-card shrink-0 w-24 h-16 rounded-xl overflow-hidden relative cursor-pointer border-2 border-slate-700/80 hover:border-brand-500 transition duration-200" id="preset_abarrotes">
+                                <img src="https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?w=150" class="w-full h-full object-cover" />
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-center p-1">
+                                    <span class="text-[9px] font-black text-white leading-tight">🌶️ Abarrotes</span>
+                                </div>
+                            </div>
+                            <div onclick="setPhotoPreset('comida')" class="preset-card shrink-0 w-24 h-16 rounded-xl overflow-hidden relative cursor-pointer border-2 border-slate-700/80 hover:border-brand-500 transition duration-200" id="preset_comida">
+                                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=150" class="w-full h-full object-cover" />
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-center p-1">
+                                    <span class="text-[9px] font-black text-white leading-tight">🌮 Comida</span>
+                                </div>
+                            </div>
                         </div>
-                        <input type="text" id="ownerVendorImgUrl" placeholder="Ingresa URL de imagen personalizada" class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-600 text-white focus:outline-none text-xs">
+                        <input type="text" id="ownerVendorImgUrl" placeholder="O ingresa cualquier URL de imagen personalizada" class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-600 text-white focus:outline-none text-xs placeholder-slate-500">
                     </div>
 
                     <button onclick="updateVendorProfile()" class="w-full bg-brand-500 hover:bg-brand-400 text-white font-bold py-3.5 rounded-xl transition duration-200 text-sm shadow-lg shadow-brand-500/20">
@@ -531,6 +594,7 @@
                     document.getElementById('ownerVendorImg').src = data.image_url;
                     document.getElementById('ownerVendorDesc').value = data.top_attributes.length > 0 ? `Excelente local de ${data.vendor_name}. Especialistas en: ${data.top_attributes.join(', ')}` : "Puesto de comida y productos del mercado tradicional.";
                     document.getElementById('ownerVendorImgUrl').value = data.image_url;
+                    document.getElementById('ownerVendorAddress').value = data.map_address || "";
                 } catch(e) { console.error("Error cargando perfil dueño:", e); }
             }
         }
@@ -584,16 +648,35 @@
                 frutas: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=600",
                 carniceria: "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600",
                 panaderia: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600",
-                queseria: "https://images.unsplash.com/photo-1486299267070-83823f5448dd?w=600"
+                queseria: "https://images.unsplash.com/photo-1486299267070-83823f5448dd?w=600",
+                flores: "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?w=600",
+                mariscos: "https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?w=600",
+                dulces: "https://images.unsplash.com/photo-1581798459219-318e76aecc7b?w=600",
+                jugos: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600",
+                abarrotes: "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?w=600",
+                comida: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600"
             };
 
-            urlInput.value = presets[type] || presets.frutas;
-            imgPreview.src = presets[type] || presets.frutas;
+            const selectedUrl = presets[type] || presets.frutas;
+            urlInput.value = selectedUrl;
+            imgPreview.src = selectedUrl;
+
+            // Cambiar bordes activos de los presets para dar feedback visual de selección
+            document.querySelectorAll('.preset-card').forEach(card => {
+                card.classList.remove('border-brand-500');
+                card.classList.add('border-slate-700/80');
+            });
+            const activeCard = document.getElementById(`preset_${type}`);
+            if(activeCard) {
+                activeCard.classList.remove('border-slate-700/80');
+                activeCard.classList.add('border-brand-500');
+            }
         }
 
         async function updateVendorProfile() {
             const desc = document.getElementById('ownerVendorDesc').value.trim();
             const imgUrl = document.getElementById('ownerVendorImgUrl').value.trim();
+            const address = document.getElementById('ownerVendorAddress').value.trim();
 
             if(!desc || !imgUrl) { alert("Por favor rellena todos los campos."); return; }
 
@@ -601,7 +684,12 @@
                 const res = await fetch(`${API_BASE}/vendors/update`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ vendor_qr: currentUser.claimed_vendor_qr, description: desc, image_url: imgUrl })
+                    body: JSON.stringify({ 
+                        vendor_qr: currentUser.claimed_vendor_qr, 
+                        description: desc, 
+                        image_url: imgUrl,
+                        map_address: address
+                    })
                 });
 
                 if(res.ok) {
