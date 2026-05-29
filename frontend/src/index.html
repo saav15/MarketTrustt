@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketTrust - Reputación Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: { brand: { 50: '#f0fdf4', 300: '#86efac', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 900: '#14532d' } }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen p-4 sm:p-8 bg-gradient-to-br from-slate-900 via-brand-900/20 to-slate-900 relative overflow-x-hidden overflow-y-auto flex flex-col items-center justify-start lg:justify-center">
+    
+    <!-- Decoración de fondo -->
+    <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-brand-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-emerald-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 pointer-events-none"></div>
+
+    <!-- Botón de Acceso al Portal (Esquina Superior Izquierda) -->
+    <div class="absolute top-4 left-4 z-40">
+        <button id="portalBtn" onclick="togglePortalModal()" class="glass-panel hover:bg-slate-800/80 px-4 py-2 rounded-xl text-xs sm:text-sm font-medium border border-slate-700 flex items-center gap-2 transition duration-200 shadow-md">
+            <span id="portalBtnIcon">🔑</span> <span id="portalBtnText">Mi Portal</span>
+        </button>
+    </div>
+
+    <div class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 z-10 my-10 lg:my-0">
+        
+        <!-- Columna Izquierda: Generador e Interfaces de Portal -->
+        <div class="flex flex-col justify-center gap-6">
+            
+            <!-- Panel Principal: Buscador de Certificados -->
+            <div id="searchPanel" class="glass-panel p-6 sm:p-10 rounded-3xl shadow-2xl w-full transform transition hover:scale-[1.01] duration-300">
+                <div class="mb-4 sm:mb-6 inline-block bg-brand-500 p-4 rounded-full shadow-[0_0_30px_rgba(34,197,94,0.4)]">
+                    <svg class="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                </div>
+                <h1 class="text-4xl sm:text-5xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-emerald-300 tracking-tight">MarketTrust</h1>
+                <p class="text-slate-300 mb-6 sm:mb-8 text-base sm:text-lg font-light leading-relaxed">Digitalizando la confianza en tu mercado local.</p>
+                
+                <div class="space-y-4">
+                    <input type="text" id="vendorQr" placeholder="Ingresa ID o QR (Ej. 101, 777)" class="w-full px-5 py-4 rounded-xl bg-slate-800/60 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/50 transition duration-200 text-sm">
+                    <button onclick="viewCertificate()" class="w-full bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-brand-500/50 transition-all transform active:scale-95 duration-200 text-sm">
+                        Generar Certificado Digital
+                    </button>
+                </div>
+            </div>
+
+            <!-- Portal del Dueño (Se muestra al loguearse como Owner) -->
+            <div id="ownerPortal" class="hidden glass-panel p-6 sm:p-10 rounded-3xl shadow-2xl w-full border border-brand-500/20">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl sm:text-2xl font-black text-brand-300 flex items-center gap-2">👨‍💼 Mi Puesto Comercial</h3>
+                    <button onclick="logout()" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg transition duration-200">Cerrar Sesión</button>
+                </div>
+
+                <!-- Caso A: No ha reclamado ningún puesto -->
+                <div id="noClaimedVendorSection" class="hidden space-y-4">
+                    <div class="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-sm text-slate-300 leading-relaxed">
+                        ⚠️ Aún no has asociado ningún puesto comercial a tu cuenta de dueño. Selecciona un puesto libre del mercado para reclamarlo.
+                    </div>
+                    <label class="block text-xs uppercase text-slate-400 font-bold tracking-wider mb-2">Puestos del Mercado Libres</label>
+                    <select id="unclaimedVendorsDropdown" class="w-full px-4 py-3.5 rounded-xl bg-slate-800 border border-slate-600 text-white focus:outline-none text-sm mb-4">
+                        <option value="">Cargando puestos libres...</option>
+                    </select>
+                    <button onclick="claimVendor()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3.5 rounded-xl transition duration-200 text-sm shadow-lg shadow-amber-500/20">
+                        Reclamar Puesto Seleccionado
+                    </button>
+                </div>
+
+                <!-- Caso B: Ya reclamó un puesto -->
+                <div id="claimedVendorSection" class="hidden space-y-5">
+                    <div class="p-4 bg-brand-900/20 border border-brand-500/20 rounded-2xl flex items-center gap-4">
+                        <img id="ownerVendorImg" class="w-16 h-16 rounded-xl object-cover border border-slate-700 shrink-0" src="" alt="Puesto">
+                        <div class="min-w-0">
+                            <h4 id="ownerVendorName" class="font-bold text-white text-base sm:text-lg truncate"></h4>
+                            <p id="ownerVendorQr" class="text-xs text-brand-300 font-semibold"></p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase text-slate-400 font-bold tracking-wider mb-2">Editar Descripción del Puesto</label>
+                        <textarea id="ownerVendorDesc" rows="3" class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm" placeholder="Describe tu local..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase text-slate-400 font-bold tracking-wider mb-2">Foto de tu Local (Presets Rápidos o URL)</label>
+                        <!-- Selector de fotos Unsplash rápidas -->
+                        <div class="grid grid-cols-4 gap-2 mb-3">
+                            <button onclick="setPhotoPreset('frutas')" class="text-xs bg-slate-800 hover:bg-slate-700 p-2 rounded-lg border border-slate-700 transition" title="Puesto de Frutas">🍎 Frutas</button>
+                            <button onclick="setPhotoPreset('carniceria')" class="text-xs bg-slate-800 hover:bg-slate-700 p-2 rounded-lg border border-slate-700 transition" title="Carnicería">🥩 Carne</button>
+                            <button onclick="setPhotoPreset('panaderia')" class="text-xs bg-slate-800 hover:bg-slate-700 p-2 rounded-lg border border-slate-700 transition" title="Panadería">🍞 Pan</button>
+                            <button onclick="setPhotoPreset('queseria')" class="text-xs bg-slate-800 hover:bg-slate-700 p-2 rounded-lg border border-slate-700 transition" title="Quesería">🧀 Quesos</button>
+                        </div>
+                        <input type="text" id="ownerVendorImgUrl" placeholder="Ingresa URL de imagen personalizada" class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-600 text-white focus:outline-none text-xs">
+                    </div>
+
+                    <button onclick="updateVendorProfile()" class="w-full bg-brand-500 hover:bg-brand-400 text-white font-bold py-3.5 rounded-xl transition duration-200 text-sm shadow-lg shadow-brand-500/20">
+                        Guardar Perfil de Puesto
+                    </button>
+                    
+                    <button onclick="goToMyCertificate()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-3 rounded-xl transition duration-200 text-xs border border-slate-700">
+                        Visualizar mi Certificado Digital 📜
+                    </button>
+                </div>
+            </div>
+
+            <!-- Portal del Cliente (Se muestra al loguearse como Client) -->
+            <div id="clientPortal" class="hidden glass-panel p-6 sm:p-10 rounded-3xl shadow-2xl w-full border border-brand-500/20">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl sm:text-2xl font-black text-brand-300 flex items-center gap-2">✍️ Dejar Reseña en Vivo</h3>
+                    <button onclick="logout()" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg transition duration-200">Cerrar Sesión</button>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs uppercase text-slate-400 font-bold tracking-wider mb-2">Selecciona un Puesto Comercial</label>
+                        <select id="reviewVendorSelect" class="w-full px-4 py-3.5 rounded-xl bg-slate-800 border border-slate-600 text-white focus:outline-none text-sm">
+                            <option value="">Cargando locales...</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase text-slate-400 font-bold tracking-wider mb-2">Calificación del Servicio</label>
+                        <!-- Selector de estrellas interactivo -->
+                        <div class="flex gap-2 text-3xl text-amber-400 select-none">
+                            <span onclick="setRating(1)" class="star cursor-pointer transition transform hover:scale-110">★</span>
+                            <span onclick="setRating(2)" class="star cursor-pointer transition transform hover:scale-110">★</span>
+                            <span onclick="setRating(3)" class="star cursor-pointer transition transform hover:scale-110">★</span>
+                            <span onclick="setRating(4)" class="star cursor-pointer transition transform hover:scale-110">★</span>
+                            <span onclick="setRating(5)" class="star cursor-pointer transition transform hover:scale-110">★</span>
+                        </div>
+                        <input type="hidden" id="reviewRatingVal" value="5">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase text-slate-400 font-bold tracking-wider mb-2">Tu Comentario</label>
+                        <textarea id="reviewComment" rows="3" placeholder="Ej: La atención fue maravillosa, verduras súper frescas y limpio." class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-600 text-white focus:outline-none text-sm placeholder-slate-500"></textarea>
+                    </div>
+
+                    <button onclick="submitClientReview()" class="w-full bg-brand-500 hover:bg-brand-400 text-white font-bold py-3.5 rounded-xl transition duration-200 text-sm shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2">
+                        <span>Publicar Reseña</span> <span class="text-xs font-normal text-brand-100">(Gemini la analizará)</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Columna Derecha: Panel de Actividad -->
+        <div class="glass-panel p-5 sm:p-8 rounded-3xl shadow-2xl flex flex-col gap-6 sm:gap-8 h-[680px] sm:h-[750px] overflow-hidden">
+            
+            <!-- Leaderboards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-20">
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700 relative">
+                    <h3 class="text-emerald-400 font-bold mb-3 flex items-center gap-2"><span class="text-xl">🏆</span> Mejores Calificados</h3>
+                    <div id="topPositive" class="space-y-2 text-sm">
+                        <div class="animate-pulse bg-slate-700 h-8 rounded"></div>
+                    </div>
+                </div>
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700 relative">
+                    <h3 class="text-amber-400 font-bold mb-3 flex items-center gap-2"><span class="text-xl">📈</span> Áreas de Mejora</h3>
+                    <div id="topNegative" class="space-y-2 text-sm">
+                        <div class="animate-pulse bg-slate-700 h-8 rounded"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feed en Vivo -->
+            <div class="flex-grow flex flex-col overflow-hidden">
+                <h3 class="text-brand-300 font-bold mb-4 text-xl flex items-center gap-3">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-brand-500"></span>
+                    </span>
+                    Actividad en Tiempo Real
+                </h3>
+                <div id="liveFeed" class="space-y-3 overflow-y-auto pr-2 custom-scrollbar pb-4 flex-grow">
+                    <div class="animate-pulse bg-slate-700 h-24 rounded-xl"></div>
+                    <div class="animate-pulse bg-slate-700 h-24 rounded-xl opacity-70"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL DE LOGIN / ACCESO AL PORTAL (Glassmorphism) -->
+    <div id="loginModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl p-8 flex flex-col transform scale-95 transition-all duration-300">
+            
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-emerald-300 tracking-tight">Acceso a MarketTrust</h3>
+                <button onclick="togglePortalModal()" class="text-slate-400 hover:text-white p-1 rounded-full bg-slate-800 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Pestañas Login vs Registro -->
+            <div class="grid grid-cols-2 gap-2 p-1 bg-slate-800 rounded-xl mb-6 border border-slate-800">
+                <button onclick="setAuthTab('login')" id="tabLogin" class="bg-brand-500 text-white font-bold py-2 rounded-lg text-sm transition">Iniciar Sesión</button>
+                <button onclick="setAuthTab('register')" id="tabRegister" class="text-slate-400 hover:text-white py-2 rounded-lg text-sm transition">Crear Cuenta</button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase text-slate-400 font-bold tracking-wider mb-2">Usuario</label>
+                    <input type="text" id="authUsername" placeholder="Ej: owner1, client1" class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase text-slate-400 font-bold tracking-wider mb-2">Contraseña</label>
+                    <input type="password" id="authPassword" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm">
+                </div>
+
+                <!-- Selección de rol (Solo visible en registro) -->
+                <div id="registerRoleField" class="hidden">
+                    <label class="block text-xs uppercase text-slate-400 font-bold tracking-wider mb-2">¿Cuál es tu rol?</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="flex items-center gap-2 p-3 bg-slate-800 rounded-xl border border-slate-700 cursor-pointer select-none">
+                            <input type="radio" name="authRole" value="client" checked class="text-brand-500 focus:ring-brand-500 bg-slate-800 border-slate-700">
+                            <span class="text-sm font-medium text-slate-200">Cliente 👤</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 bg-slate-800 rounded-xl border border-slate-700 cursor-pointer select-none">
+                            <input type="radio" name="authRole" value="owner" class="text-brand-500 focus:ring-brand-500 bg-slate-800 border-slate-700">
+                            <span class="text-sm font-medium text-slate-200">Dueño 👨‍💼</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="authErrorMsg" class="hidden p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-xs leading-relaxed text-center"></div>
+
+                <button id="authSubmitBtn" onclick="handleAuthSubmit()" class="w-full bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all text-sm">
+                    Ingresar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(34, 197, 94, 0.5); border-radius: 10px; }
+    </style>
+
+    <script>
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:8000'
+            : 'https://markettrustt-production.up.railway.app';
+
+        let currentUser = null;
+        let currentAuthMode = 'login'; // 'login' or 'register'
+
+        // Al iniciar, verificar sesión guardada en localStorage
+        window.onload = function() {
+            const savedUser = localStorage.getItem('markettrust_session');
+            if(savedUser) {
+                currentUser = JSON.parse(savedUser);
+                applySessionUI();
+            }
+            updateLeaderboards();
+            updateFeed();
+            loadDropdowns();
+            
+            // Polling cada 5 segundos
+            setInterval(updateLeaderboards, 5000);
+            setInterval(updateFeed, 5000);
+        };
+
+        function viewCertificate() {
+            const qr = document.getElementById('vendorQr').value.trim();
+            if(!qr) { alert('Por favor ingresa un ID de vendedor válido (Ej. 101, 777)'); return; }
+            window.location.href = `certificate.html?qr=${qr}`;
+        }
+
+        function goToMyCertificate() {
+            if(currentUser && currentUser.claimed_vendor_qr) {
+                window.location.href = `certificate.html?qr=${currentUser.claimed_vendor_qr}`;
+            }
+        }
+
+        async function updateLeaderboards() {
+            try {
+                const res = await fetch(`${API_BASE}/leaderboard`);
+                if(!res.ok) return;
+                const data = await res.json();
+                
+                const posContainer = document.getElementById('topPositive');
+                posContainer.innerHTML = data.top_positive.map((v, i) => {
+                    const isPerfect = v.avg >= 5.0;
+                    const borderClass = isPerfect ? 'border-amber-400/80 ring-2 ring-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.6)] animate-pulse' : 'border-slate-700/50';
+                    const ratingColor = isPerfect ? 'text-amber-400 font-extrabold flex items-center gap-1 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]' : 'text-emerald-400 font-bold';
+                    const ratingText = isPerfect ? '👑 5.0★' : `${v.avg.toFixed(1)}★`;
+                    return `
+                    <div class="group relative flex justify-between items-center bg-slate-900/50 p-2 rounded-lg border transition hover:bg-slate-800 cursor-help ${borderClass}">
+                        <span class="text-slate-300 truncate w-3/4 font-medium"><span class="text-slate-500 mr-1">#${i+1}</span> ${v.name} <span class="text-[10px] text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded ml-1">ID:${v.qr}</span></span>
+                        <span class="${ratingColor}">${ratingText}</span>
+                        
+                        <!-- Tooltip flotante (Glassmorphism) -->
+                        <div class="pointer-events-none absolute bottom-[115%] left-1/2 -translate-x-1/2 mb-2 w-64 bg-slate-950/95 border ${isPerfect ? 'border-amber-400/50 shadow-[0_0_20px_rgba(251,191,36,0.4)]' : 'border-brand-500/30'} text-xs text-slate-200 p-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 backdrop-blur-md">
+                            <div class="font-bold ${isPerfect ? 'text-amber-400' : 'text-brand-300'} mb-1 flex justify-between">
+                                <span>${v.name} ${isPerfect ? '👑' : ''}</span>
+                                <span class="text-emerald-400">${v.avg.toFixed(1)}★</span>
+                            </div>
+                            <p class="font-light text-slate-400 leading-normal">${v.description}</p>
+                            <div class="text-[9px] text-slate-500 mt-1.5 italic flex justify-between">
+                                <span>ID del puesto: #${v.qr}</span>
+                                <span>Total: ${v.count} reseñas</span>
+                            </div>
+                            <!-- Flecha del tooltip -->
+                            <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-950"></div>
+                        </div>
+                    </div>
+                    `;
+                }).join('') || '<p class="text-slate-500 text-xs italic">Sin datos suficientes</p>';
+
+                const negContainer = document.getElementById('topNegative');
+                negContainer.innerHTML = data.top_negative.map((v, i) => {
+                    const isPerfect = v.avg >= 5.0;
+                    const borderClass = isPerfect ? 'border-amber-400/80 ring-2 ring-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.6)] animate-pulse' : 'border-slate-700/50';
+                    const ratingColor = isPerfect ? 'text-amber-400 font-extrabold flex items-center gap-1 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]' : 'text-amber-400 font-bold';
+                    const ratingText = isPerfect ? '👑 5.0★' : `${v.avg.toFixed(1)}★`;
+                    return `
+                    <div class="group relative flex justify-between items-center bg-slate-900/50 p-2 rounded-lg border transition hover:bg-slate-800 cursor-help ${borderClass}">
+                        <span class="text-slate-300 truncate w-3/4 font-medium"><span class="text-slate-500 mr-1">#${i+1}</span> ${v.name} <span class="text-[10px] text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded ml-1">ID:${v.qr}</span></span>
+                        <span class="${ratingColor}">${ratingText}</span>
+                        
+                        <!-- Tooltip flotante (Glassmorphism) -->
+                        <div class="pointer-events-none absolute bottom-[115%] left-1/2 -translate-x-1/2 mb-2 w-64 bg-slate-950/95 border ${isPerfect ? 'border-amber-400/50 shadow-[0_0_20px_rgba(251,191,36,0.4)]' : 'border-brand-500/30'} text-xs text-slate-200 p-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 backdrop-blur-md">
+                            <div class="font-bold ${isPerfect ? 'text-amber-400' : 'text-amber-300'} mb-1 flex justify-between">
+                                <span>${v.name} ${isPerfect ? '👑' : ''}</span>
+                                <span class="text-amber-400">${v.avg.toFixed(1)}★</span>
+                            </div>
+                            <p class="font-light text-slate-400 leading-normal">${v.description}</p>
+                            <div class="text-[9px] text-slate-500 mt-1.5 italic flex justify-between">
+                                <span>ID del puesto: #${v.qr}</span>
+                                <span>Total: ${v.count} reseñas</span>
+                            </div>
+                            <!-- Flecha del tooltip -->
+                            <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-950"></div>
+                        </div>
+                    </div>
+                    `;
+                }).join('') || '<p class="text-slate-500 text-xs italic">Sin datos suficientes</p>';
+            } catch (e) { console.error("Error leaderboard:", e); }
+        }
+
+        async function updateFeed() {
+            try {
+                const res = await fetch(`${API_BASE}/feed`);
+                if(!res.ok) return;
+                const data = await res.json();
+                const feedContainer = document.getElementById('liveFeed');
+                
+                feedContainer.innerHTML = data.map(r => {
+                    let badgeColor = r.sentiment === 'Positivo' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 
+                                   (r.sentiment === 'Negativo' ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-slate-500/20 text-slate-400 border-slate-500/30');
+                    let stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+                    return `
+                    <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700/50 transform transition duration-300 hover:scale-[1.02] hover:bg-slate-800 hover:border-slate-600 hover:shadow-lg">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center flex-wrap gap-2">
+                                <span class="text-brand-300 font-bold text-sm drop-shadow-sm">${r.vendor_name}</span>
+                                <span class="text-[10px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded border border-slate-700">ID: ${r.vendor_qr}</span>
+                            </div>
+                            <span class="text-xs text-slate-400 font-medium">${r.time}</span>
+                        </div>
+                        <p class="text-slate-300 text-sm italic mb-3 leading-relaxed">"${r.comment}"</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <span class="text-amber-400 text-xs tracking-widest drop-shadow">${stars}</span>
+                                <span class="text-[11px] text-slate-400 font-medium flex items-center gap-1"><span class="text-slate-500">👤</span> @${r.customer_name}</span>
+                            </div>
+                            <span class="text-[10px] px-2.5 py-1 rounded-full border uppercase tracking-wider font-bold ${badgeColor}">${r.sentiment}</span>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            } catch (e) { console.error("Error feed:", e); }
+        }
+
+        // --- PORTAL Y LÓGICA DE USUARIOS ---
+
+        function togglePortalModal() {
+            const modal = document.getElementById('loginModal');
+            document.getElementById('authErrorMsg').classList.add('hidden');
+            modal.classList.toggle('hidden');
+        }
+
+        function setAuthTab(mode) {
+            currentAuthMode = mode;
+            const tabLogin = document.getElementById('tabLogin');
+            const tabRegister = document.getElementById('tabRegister');
+            const roleField = document.getElementById('registerRoleField');
+            const submitBtn = document.getElementById('authSubmitBtn');
+
+            if(mode === 'login') {
+                tabLogin.className = "bg-brand-500 text-white font-bold py-2 rounded-lg text-sm transition";
+                tabRegister.className = "text-slate-400 hover:text-white py-2 rounded-lg text-sm transition";
+                roleField.classList.add('hidden');
+                submitBtn.innerText = "Ingresar";
+            } else {
+                tabRegister.className = "bg-brand-500 text-white font-bold py-2 rounded-lg text-sm transition";
+                tabLogin.className = "text-slate-400 hover:text-white py-2 rounded-lg text-sm transition";
+                roleField.classList.remove('hidden');
+                submitBtn.innerText = "Registrarse y Crear Cuenta";
+            }
+        }
+
+        async function handleAuthSubmit() {
+            const usernameInput = document.getElementById('authUsername').value.trim();
+            const passwordInput = document.getElementById('authPassword').value.trim();
+            const errorMsg = document.getElementById('authErrorMsg');
+
+            if(!usernameInput || !passwordInput) {
+                errorMsg.innerText = "Por favor completa todos los campos";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                if(currentAuthMode === 'login') {
+                    const res = await fetch(`${API_BASE}/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: usernameInput, password: passwordInput })
+                    });
+                    
+                    if(!res.ok) {
+                        const err = await res.json();
+                        errorMsg.innerText = err.detail || "Error de credenciales";
+                        errorMsg.classList.remove('hidden');
+                        return;
+                    }
+
+                    currentUser = await res.json();
+                    localStorage.setItem('markettrust_session', JSON.stringify(currentUser));
+                    togglePortalModal();
+                    applySessionUI();
+                } else {
+                    const roleVal = document.querySelector('input[name="authRole"]:checked').value;
+                    const res = await fetch(`${API_BASE}/auth/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: usernameInput, password: passwordInput, role: roleVal })
+                    });
+
+                    if(!res.ok) {
+                        const err = await res.json();
+                        errorMsg.innerText = err.detail || "Error al registrarse";
+                        errorMsg.classList.remove('hidden');
+                        return;
+                    }
+
+                    // Después de registrarse, iniciamos sesión automáticamente
+                    const loginRes = await fetch(`${API_BASE}/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: usernameInput, password: passwordInput })
+                    });
+                    currentUser = await loginRes.json();
+                    localStorage.setItem('markettrust_session', JSON.stringify(currentUser));
+                    togglePortalModal();
+                    applySessionUI();
+                }
+            } catch(e) {
+                errorMsg.innerText = "Error de servidor al intentar iniciar sesión.";
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        function applySessionUI() {
+            if(!currentUser) return;
+            
+            // Cambiar botón de Acceso
+            document.getElementById('portalBtnText').innerText = `@${currentUser.username} (${currentUser.role === 'owner' ? 'Dueño' : 'Cliente'})`;
+            document.getElementById('portalBtnIcon').innerText = currentUser.role === 'owner' ? '👨‍💼' : '👤';
+
+            // Ocultar buscador e interfaces de no logueado
+            document.getElementById('searchPanel').classList.add('hidden');
+
+            if(currentUser.role === 'owner') {
+                document.getElementById('clientPortal').classList.add('hidden');
+                document.getElementById('ownerPortal').classList.remove('hidden');
+                loadOwnerPuestoDetails();
+            } else {
+                document.getElementById('ownerPortal').classList.add('hidden');
+                document.getElementById('clientPortal').classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('markettrust_session');
+            
+            // Volver interfaz a no logueado
+            document.getElementById('portalBtnText').innerText = "Mi Portal";
+            document.getElementById('portalBtnIcon').innerText = "🔑";
+            
+            document.getElementById('searchPanel').classList.remove('hidden');
+            document.getElementById('ownerPortal').classList.add('hidden');
+            document.getElementById('clientPortal').classList.add('hidden');
+            loadDropdowns();
+        }
+
+        // --- FUNCIONALIDADES DE DUEÑO (OWNER) ---
+
+        async function loadOwnerPuestoDetails() {
+            if(!currentUser || currentUser.role !== 'owner') return;
+
+            const noClaimSection = document.getElementById('noClaimedVendorSection');
+            const claimSection = document.getElementById('claimedVendorSection');
+
+            if(!currentUser.claimed_vendor_qr) {
+                noClaimSection.classList.remove('hidden');
+                claimSection.classList.add('hidden');
+                loadUnclaimedVendors();
+            } else {
+                noClaimSection.classList.add('hidden');
+                claimSection.classList.remove('hidden');
+
+                try {
+                    const res = await fetch(`${API_BASE}/vendors/${currentUser.claimed_vendor_qr}/stats`);
+                    const data = await res.json();
+                    
+                    document.getElementById('ownerVendorName').innerText = data.vendor_name;
+                    document.getElementById('ownerVendorQr').innerText = `ID QR: ${currentUser.claimed_vendor_qr} (Calificación: ${data.average_rating}★)`;
+                    document.getElementById('ownerVendorImg').src = data.image_url;
+                    document.getElementById('ownerVendorDesc').value = data.top_attributes.length > 0 ? `Excelente local de ${data.vendor_name}. Especialistas en: ${data.top_attributes.join(', ')}` : "Puesto de comida y productos del mercado tradicional.";
+                    document.getElementById('ownerVendorImgUrl').value = data.image_url;
+                } catch(e) { console.error("Error cargando perfil dueño:", e); }
+            }
+        }
+
+        async function loadUnclaimedVendors() {
+            try {
+                const res = await fetch(`${API_BASE}/vendors/unclaimed`);
+                const data = await res.json();
+                const dropdown = document.getElementById('unclaimedVendorsDropdown');
+                
+                if(data.length === 0) {
+                    dropdown.innerHTML = '<option value="">No hay locales disponibles libres</option>';
+                    return;
+                }
+
+                dropdown.innerHTML = data.map(v => `
+                    <option value="${v.qr}">${v.name} (ID: ${v.qr})</option>
+                `).join('');
+            } catch(e) { console.error("Error unclaimed vendors:", e); }
+        }
+
+        async function claimVendor() {
+            const selectVal = document.getElementById('unclaimedVendorsDropdown').value;
+            if(!selectVal) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/vendors/claim`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ vendor_qr: selectVal, username: currentUser.username })
+                });
+
+                if(!res.ok) {
+                    alert("Error al reclamar el local.");
+                    return;
+                }
+
+                const result = await res.json();
+                currentUser.claimed_vendor_qr = result.claimed_vendor_qr;
+                localStorage.setItem('markettrust_session', JSON.stringify(currentUser));
+                applySessionUI();
+                alert("¡Felicidades! Has reclamado tu local con éxito. Ahora puedes editar su información.");
+            } catch(e) { console.error("Error claim:", e); }
+        }
+
+        function setPhotoPreset(type) {
+            const urlInput = document.getElementById('ownerVendorImgUrl');
+            const imgPreview = document.getElementById('ownerVendorImg');
+            
+            const presets = {
+                frutas: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=600",
+                carniceria: "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600",
+                panaderia: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600",
+                queseria: "https://images.unsplash.com/photo-1486299267070-83823f5448dd?w=600"
+            };
+
+            urlInput.value = presets[type] || presets.frutas;
+            imgPreview.src = presets[type] || presets.frutas;
+        }
+
+        async function updateVendorProfile() {
+            const desc = document.getElementById('ownerVendorDesc').value.trim();
+            const imgUrl = document.getElementById('ownerVendorImgUrl').value.trim();
+
+            if(!desc || !imgUrl) { alert("Por favor rellena todos los campos."); return; }
+
+            try {
+                const res = await fetch(`${API_BASE}/vendors/update`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ vendor_qr: currentUser.claimed_vendor_qr, description: desc, image_url: imgUrl })
+                });
+
+                if(res.ok) {
+                    alert("¡Perfil de tu local actualizado correctamente!");
+                    loadOwnerPuestoDetails();
+                    updateLeaderboards();
+                } else {
+                    alert("Error al actualizar perfil de tu local.");
+                }
+            } catch(e) { console.error("Error update profile:", e); }
+        }
+
+        // --- FUNCIONALIDADES DE CLIENTE (CLIENT) ---
+
+        async function loadDropdowns() {
+            try {
+                const res = await fetch(`${API_BASE}/vendors`);
+                const data = await res.json();
+                
+                const select = document.getElementById('reviewVendorSelect');
+                select.innerHTML = '<option value="">-- Selecciona un local --</option>' + data.map(v => `
+                    <option value="${v.qr}">${v.name} (ID: ${v.qr})</option>
+                `).join('');
+            } catch(e) { console.error("Error loading dropdowns:", e); }
+        }
+
+        function setRating(val) {
+            document.getElementById('reviewRatingVal').value = val;
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, idx) => {
+                if(idx < val) {
+                    star.className = "star cursor-pointer transition transform hover:scale-110 text-amber-400";
+                } else {
+                    star.className = "star cursor-pointer transition transform hover:scale-110 text-slate-650 text-slate-600";
+                }
+            });
+        }
+
+        async function submitClientReview() {
+            const qrSelect = document.getElementById('reviewVendorSelect').value;
+            const ratingVal = parseInt(document.getElementById('reviewRatingVal').value);
+            const commentVal = document.getElementById('reviewComment').value.trim();
+
+            if(!qrSelect || !commentVal) {
+                alert("Por favor selecciona un puesto y escribe un comentario.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/reviews/new`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        vendor_qr: qrSelect,
+                        customer_name: currentUser.username,
+                        rating: ratingVal,
+                        comment: commentVal
+                    })
+                });
+
+                if(res.ok) {
+                    alert("¡Tu reseña ha sido enviada con éxito! En unos segundos Gemini AI la procesará y aparecerá en el feed.");
+                    document.getElementById('reviewComment').value = '';
+                    setRating(5);
+                } else {
+                    alert("Error al procesar la reseña.");
+                }
+            } catch(e) { console.error("Error submitting review:", e); }
+        }
+    </script>
+</body>
+</html>

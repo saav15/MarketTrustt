@@ -1,0 +1,47 @@
+/* Estilos CSS adicionales para el Frontend de MarketTrust */
+
+.glass-panel {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media print {
+    body {
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+    }
+    
+    #certificate {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 auto !important;
+        width: 100% !important;
+        height: 100% !important;
+        page-break-after: avoid;
+    }
+}
+
+/* Asegurar que las letras de los inputs, textareas y selects sean siempre blancas en todos los temas del navegador */
+input, textarea, select {
+    color: #ffffff !important;
+}
+
+/* Evitar que el autocompletado del navegador (Autofill) arruine los colores en modo oscuro */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+    -webkit-text-fill-color: #ffffff !important;
+    -webkit-box-shadow: 0 0 0px 1000px #1e293b inset !important; /* Mismo color de fondo oscuro que bg-slate-800 */
+    transition: background-color 5000s ease-in-out 0s;
+}
