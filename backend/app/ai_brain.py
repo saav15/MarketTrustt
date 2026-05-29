@@ -4,7 +4,7 @@ import json
 from . import models, database
 
 # Configurar API Key. Prioriza variable de entorno o usa la proporcionada directamente.
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyBTAJJ16pjap3UxkoFrm6cGaFuX34uL30k")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyA4ysGBnJxFyQPnB4k13bR75B3gIA9xlJc")
 
 genai.configure(api_key=GEMINI_API_KEY)
 # Usar gemini-1.5-flash por ser rápido e ideal para tareas de extracción y clasificación
